@@ -1,0 +1,38 @@
+buildscript {
+    ext.kotlin_version = '1.7.10'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        implementation 'org.tensorflow:tensorflow-lite:'
+        implementation 'org.tensorflow:tensorflow-lite-gpu:'
+
+//         classpath 'com.android.tools.build:gradle:7.2.0'
+//         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+    }
+}
+
+config = QuantizationConfig.for_float16()
+model.export(export_dir='.', tflite_filename='model_unquant.tflite', quantization_config=config)
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
